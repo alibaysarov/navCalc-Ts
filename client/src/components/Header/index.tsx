@@ -6,6 +6,7 @@ import { Stack, Box } from "@mui/material";
 import Settings from "../Settings";
 import Profile from "./../Profile";
 import FlightPlanModal from "../FlighPlanModal";
+import FilterModal from "../FIlterModal";
 const Header = () => {
   const theme = useTheme();
   
@@ -36,6 +37,7 @@ const Header = () => {
         </AppBar>
       </Box>
       <FlightPlanModal/>
+      <FilterModal/>
     </>
   );
 };

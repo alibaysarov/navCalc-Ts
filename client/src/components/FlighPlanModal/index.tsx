@@ -1,4 +1,4 @@
-import { Box, Menu, Paper, Stack, Typography,Tooltip,TextField } from '@mui/material';
+import { Box, Menu, Paper, Stack, Typography,Tooltip,TextField,Autocomplete } from '@mui/material';
 import React from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useAppDispatch, useAppSelector } from '../../hooks';
@@ -11,14 +11,23 @@ import FlightLandIcon from '@mui/icons-material/FlightLand';
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
 import Waypoint from '../Waypoint/';
 import { useTheme } from '@emotion/react';
+import { findAirportHandler } from '../../store/slices/flighPlanSlice';
 const FlightPlanModal = () => {
   const theme=useTheme()
   const dispatch=useAppDispatch()
     const {anchorEl}=useAppSelector(state=>state.ui)
+    const {airportList}=useAppSelector(state=>state.flightPlan)
     const open = Boolean(anchorEl);
     const handleClose=()=>{
       dispatch(closeFligtPlan())
     }
+    const departureInputHandler:React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> =(event)=>{
+      if(event.target.value.length>0){
+        dispatch(findAirportHandler(event.target.value))
+      }
+    }
+
+    
     return (
       <Menu sx={{backGroundColor:'#fff'}} transformOrigin={{vertical:'top', horizontal:'left'}} anchorEl={anchorEl} open={open}  onClose={handleClose}>
         <Paper sx={{p:2,pt:1}} elevation={0}>
@@ -51,11 +60,24 @@ const FlightPlanModal = () => {
           <Stack sx={{marginTop:1}} direction={'row'} spacing={'10px'} alignItems={'center'}>
             <Stack spacing={'3px'} direction={'column'}>
               <FlightTakeoffIcon color={`${theme.palette.common.black}`}/>
-              <TextField id="outlined-basic" sx={{maxWidth:'133px'}} label="Аэропорт вылета" placeholder='UUDD' variant="outlined" />
+              
+              <Autocomplete
+                id="free-solo-demo"
+                freeSolo
+                options={airportList.map(el=>el.name)}
+                sx={{minWidth:'133px',maxHeight:'56px'}}
+                renderInput={(params)=><TextField {...params} id="outlined-basic" onChange={departureInputHandler}  label="Аэропорт вылета" placeholder='UUDD' variant="outlined" />}
+                 />
             </Stack>
             <Stack spacing={'3px'} direction={'column'}>
               <FlightLandIcon color={`${theme.palette.common.black}`}/>
-              <TextField id="outlined-basic" sx={{maxWidth:'133px'}} label="Аэропорт вылета" placeholder='KJFK' variant="outlined" />
+              <Autocomplete
+                id="free-solo-demo"
+                freeSolo
+                options={airportList.map(el=>el.name)}
+                sx={{minWidth:'133px',maxHeight:'56px'}}
+                renderInput={(params)=><TextField {...params} id="outlined-basic" onChange={departureInputHandler}  label="Аэропорт назначения" placeholder='UUDD' variant="outlined" />}
+                 />
             </Stack>
           </Stack>
 

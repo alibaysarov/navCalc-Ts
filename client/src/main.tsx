@@ -6,6 +6,10 @@ import { ThemeProvider } from "@emotion/react";
 import theme from "./theme.ts";
 import { Provider } from 'react-redux';
 import store from "./store/index.ts";
+import env from 'react-dotenv';
+// env.config({
+//   path:'../.env'
+// })
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <Provider store={store}>
 

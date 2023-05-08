@@ -1,9 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import uiReducer from "./slices/ui";
+import routeLineReducer from "./slices/routeLineSlice";
+import flighPlanSlice from "./slices/flighPlanSlice";
 
 const store=configureStore({
     reducer:{
-        ui:uiReducer
+        ui:uiReducer,
+        routeLine:routeLineReducer,
+        flightPlan:flighPlanSlice
     },
     middleware:(getDefaultMiddleWare)=>getDefaultMiddleWare({
         serializableCheck:false

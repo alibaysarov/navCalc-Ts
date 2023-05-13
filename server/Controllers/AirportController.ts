@@ -21,3 +21,17 @@ try {
     res.status(500).json(err)
 }
 }
+export const getAll=async(req:Request,res:Response)=>{
+    try {
+        const airports=await Airport.find().limit(10).exec();
+        if(airports.length>0){
+            return res.status(200).json(airports)
+        }else{
+            return res.status(404).json({
+                message:'Аэродромы не найдены'
+            })
+        }
+    } catch (err) {
+        return res.status(500).json(err)
+    }
+}

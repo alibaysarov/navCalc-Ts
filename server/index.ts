@@ -1,10 +1,11 @@
 import express,{Express,Request,Response} from 'express';
-
+import cors from 'cors';
 import dotenv from 'dotenv';
 dotenv.config()
 import airportRouter from './routes/airports';
 import mongoose from 'mongoose';
 const app:Express=express()
+app.use(cors())
 app.use(express.json())
 mongoose.connect(`${process.env.MONGO_URL}`)
 .then(()=>{

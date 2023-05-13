@@ -11,22 +11,38 @@ import FlightLandIcon from '@mui/icons-material/FlightLand';
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
 import Waypoint from '../Waypoint/';
 import { useTheme } from '@emotion/react';
-import { findAirportHandler } from '../../store/slices/flighPlanSlice';
+import { findAirportHandler, resetArrivalCoorinates, resetDepartureCoorinates, setArrivalCoorinates, setDepartureCoorinates } from '../../store/slices/flighPlanSlice';
 const FlightPlanModal = () => {
   const theme=useTheme()
   const dispatch=useAppDispatch()
     const {anchorEl}=useAppSelector(state=>state.ui)
-    const {airportList}=useAppSelector(state=>state.flightPlan)
+    const {airportList,totalDistance}=useAppSelector(state=>state.flightPlan)
     const open = Boolean(anchorEl);
     const handleClose=()=>{
       dispatch(closeFligtPlan())
     }
-    const departureInputHandler:React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> =(event)=>{
-      if(event.target.value.length>0){
+    const arrivalInputHandler:React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> =(event)=>{
+      
         dispatch(findAirportHandler(event.target.value))
+      
+    }
+    const departureInputHandler:React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> =(event)=>{
+      
+        dispatch(findAirportHandler(event.target.value))
+      
+    }
+    const selectArrivalHandler=(e:React.SyntheticEvent<Element, Event>)=>{
+      if(e.currentTarget.textContent!=null){
+        dispatch(setArrivalCoorinates(e.currentTarget.textContent))
+        
       }
     }
-
+    const selectDepartureHandler=(e:React.SyntheticEvent<Element, Event>)=>{
+      if(e.currentTarget.textContent!=null){
+        dispatch(setDepartureCoorinates(e.currentTarget.textContent))
+        
+      }
+    }
     
     return (
       <Menu sx={{backGroundColor:'#fff'}} transformOrigin={{vertical:'top', horizontal:'left'}} anchorEl={anchorEl} open={open}  onClose={handleClose}>
@@ -64,9 +80,17 @@ const FlightPlanModal = () => {
               <Autocomplete
                 id="free-solo-demo"
                 freeSolo
-                options={airportList.map(el=>el.name)}
+                onChange={selectDepartureHandler}
+                onInputChange={(evt,newVal,reason)=>{
+                  
+                  if (reason==='clear' || newVal.trim()=='') {
+                    dispatch(resetDepartureCoorinates())
+                    return
+                  }
+                }}
+                options={airportList.length<1?[]:airportList.map(el=>el.location.properties.name)}
                 sx={{minWidth:'133px',maxHeight:'56px'}}
-                renderInput={(params)=><TextField {...params} id="outlined-basic" onChange={departureInputHandler}  label="Аэропорт вылета" placeholder='UUDD' variant="outlined" />}
+                renderInput={(params)=><TextField {...params} id="outlined-basic" onChange={arrivalInputHandler}  label="Аэропорт вылета" placeholder='UUDD' variant="outlined" />}
                  />
             </Stack>
             <Stack spacing={'3px'} direction={'column'}>
@@ -74,7 +98,14 @@ const FlightPlanModal = () => {
               <Autocomplete
                 id="free-solo-demo"
                 freeSolo
-                options={airportList.map(el=>el.name)}
+                onInputChange={(evt,newVal,reason)=>{
+                  if (reason==='clear'|| newVal.trim()=='') {
+                    dispatch(resetArrivalCoorinates())
+                    return
+                  }
+                }}
+                onChange={selectArrivalHandler}
+                options={airportList.length<1?[]:airportList.map(el=>el.location.properties.name)}
                 sx={{minWidth:'133px',maxHeight:'56px'}}
                 renderInput={(params)=><TextField {...params} id="outlined-basic" onChange={departureInputHandler}  label="Аэропорт назначения" placeholder='UUDD' variant="outlined" />}
                  />
@@ -89,7 +120,7 @@ const FlightPlanModal = () => {
             }
           </Stack>
           <Stack direction={'column'} spacing={0}>
-              <Typography variant='body2' component={'p'}>Расстояние: 400км</Typography>
+              <Typography variant='body2' component={'p'}>Расстояние: {''+totalDistance.toFixed(1) } км</Typography>
               <Typography variant='body2' component={'p'}>Время: 5:40</Typography>
           </Stack>
         </Paper>

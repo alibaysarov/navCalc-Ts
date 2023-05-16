@@ -1,0 +1,11 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\client",
+    "\\client\\src",
+    "\\client\\src\\components",
+    "\\client\\src\\components\\FlighPlanModal"
+  ],
+  "SelectedNode": "\\client\\src\\components\\FlighPlanModal\\index.tsx",
+  "PreviewInSolutionExplorer": false
+}

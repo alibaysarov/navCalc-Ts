@@ -16,7 +16,7 @@ const FlightPlanModal = () => {
   const theme=useTheme()
   const dispatch=useAppDispatch()
     const {anchorEl}=useAppSelector(state=>state.ui)
-    const {airportList,totalDistance}=useAppSelector(state=>state.flightPlan)
+    const {airportList,totalDistance,waypoints}=useAppSelector(state=>state.flightPlan)
     const open = Boolean(anchorEl);
     const handleClose=()=>{
       dispatch(closeFligtPlan())
@@ -114,9 +114,11 @@ const FlightPlanModal = () => {
 
           <Stack sx={{maxHeight:'204px',overflowY:'auto',mt:1,mb:2}} direction={'column'} spacing={1}>
             {
-              [1,2,3,4].map(el=>(
-                <Waypoint/>
+              waypoints.length>0
+              ?waypoints.map(el=>(
+                <Waypoint  {...el} />
               ))
+              :(<Typography variant='h3' component={'h3'}>No points</Typography>)
             }
           </Stack>
           <Stack direction={'column'} spacing={0}>

@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice,PayloadAction } from "@reduxjs/toolkit";
 import axios from '../../axios';
 import { Coordinate } from "ol/coordinate";
-import { calcDistance } from "../../utils/airNavigation";
+import { calcDistance, getLegDistance, IWayPoint, Leg, Route } from "../../utils/airNavigation";
 
 
 interface AirPortProperties{
@@ -20,12 +20,15 @@ interface AirportListItem extends Object{
     location: AirportLoc,
     _id: string
 }
+
 interface IFplnSlice{
     departureAirportInputValue:string,
     arrivalAirportInputValue:string,
     airportList:AirportListItem[] |[],
     departureAirport:AirportListItem |null,
     arrivalAirport:AirportListItem |null,
+    points:Coordinate[]|[[],[]], 
+    waypoints:IWayPoint[]|[],
     totalDistance:number,
 }
 
@@ -35,7 +38,10 @@ const initialState:IFplnSlice={
     airportList:[],
     departureAirport:null,
     arrivalAirport:null,
-    totalDistance:0
+    totalDistance:0,
+    points:[[],[]],
+    waypoints:[]
+    
 }
 
 
@@ -76,9 +82,8 @@ const flighPlanSlice=createSlice({
                 const{coordinates:depCoordinates}=state.departureAirport.location.geometry;
                 const{coordinates:arriveCoordinates}=state.arrivalAirport.location.geometry;
                 state.totalDistance=calcDistance([depCoordinates,arriveCoordinates],'km');
+                state.points=[depCoordinates,arriveCoordinates];
             }
-            
-            
         },
         resetDepartureCoorinates:(state)=>{
             state.departureAirport=null;
@@ -94,14 +99,23 @@ const flighPlanSlice=createSlice({
                 const{coordinates:depCoordinates}=state.departureAirport.location.geometry;
                 const{coordinates:arriveCoordinates}=state.arrivalAirport.location.geometry;
                 state.totalDistance=calcDistance([depCoordinates,arriveCoordinates],'km');
+                state.points=[depCoordinates,arriveCoordinates];
             }
         },
         resetArrivalCoorinates:(state)=>{
             state.departureAirport=null;
             state.arrivalAirport=null;
             state.totalDistance=0;
+        },
+        calculateWaypoints:(state,action:PayloadAction<Coordinate[]>)=>{
+            state.points=action.payload
+            const modWps=new Route(state.points)
+            
+            state.waypoints=modWps.points as IWayPoint[]
+            state.totalDistance=modWps.points.map(el=>el.distance).reduce((a,b)=>a+b)
+            console.log(state.waypoints);
+            
         }
-       
     },
     extraReducers:(builder)=>{
         builder.addCase(findAirportHandler.fulfilled,(state,action)=>{
@@ -118,6 +132,8 @@ export const {
             setArrivalCoorinates,
             setDepartureCoorinates,
             resetArrivalCoorinates,
-            resetDepartureCoorinates
+            resetDepartureCoorinates,
+
+            calculateWaypoints
             }=flighPlanSlice.actions;
 export default flighPlanSlice.reducer
